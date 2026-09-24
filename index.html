@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation</title>
+  <meta name="description" content="A self-contained modular tendon-driven continuum robot: interchangeable joints with precomputed stiffness, and onboard magnetic proprioception with a single joint-level MLP reused across every joint.">
+  <meta property="og:title" content="Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation">
+  <meta property="og:description" content="IROS 2026. Modular continuum robot with programmable joint stiffness and in-situ magnetic self pose estimation. Code release: ModTenV1.">
+  <meta property="og:image" content="https://ansue1234.github.io/ModTenV1/static/images/video_poster.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%236f5ce0'/%3E%3Ccircle cx='32' cy='32' r='11' fill='white'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- KaTeX (vendored, MIT) for the equations -->
+  <link rel="stylesheet" href="static/katex/katex.min.css">
+  <script defer src="static/katex/katex.min.js"></script>
+  <script defer src="static/katex/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script>
+
+  <style>
+    :root {
+      --text: #363636;
+      --muted: #6b6b6b;
+      --link: #3273dc;
+      --link-hover: #275fbf;
+      --accent: #6f5ce0;
+      --bg: #ffffff;
+      --bg-alt: #f7f7f9;
+      --border: #e6e6ea;
+      --code-bg: #f4f4f6;
+      --max: 1040px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { color: var(--link-hover); text-decoration: underline; }
+    h1, h2, h3 { font-family: "Google Sans", "Noto Sans", sans-serif; line-height: 1.2; margin: 0; }
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+    .narrow { max-width: 820px; margin: 0 auto; }
+    section { padding: 40px 0; }
+    section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    h2.section-title { font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 1.2rem; }
+    h3.sub { font-size: 1.35rem; font-weight: 600; margin: 1.8rem 0 0.6rem; }
+    p { margin: 0 0 1rem; }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 48px 0 24px; text-align: center; }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      max-width: 960px;
+      margin: 0 auto 1.4rem;
+    }
+    .authors { font-size: 1.18rem; margin: 0 auto 0.5rem; max-width: 900px; }
+    .authors span.a { white-space: nowrap; }
+    .authors sup { font-size: 0.7em; color: var(--muted); }
+    .affil { font-size: 1.05rem; color: var(--text); margin-bottom: 0.25rem; }
+    .note { font-size: 0.95rem; color: var(--muted); margin-bottom: 1.4rem; }
+    .venue { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 1.6rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #363636; color: #fff !important;
+      border-radius: 999px; padding: 9px 18px;
+      font-size: 0.95rem; font-weight: 500; text-decoration: none !important;
+      transition: background .15s ease, transform .1s ease;
+    }
+    .btn:hover { background: #1f1f1f; transform: translateY(-1px); }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .teaser { margin: 0 auto; max-width: 880px; }
+    .teaser video, .teaser img {
+      width: 100%; height: auto; display: block;
+      border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.12);
+      background: #000;
+    }
+    .caption { font-size: 0.95rem; color: var(--muted); text-align: center; margin: 0.8rem auto 0; max-width: 820px; }
+
+    /* ---------- figures ---------- */
+    figure { margin: 1.4rem 0 1.6rem; }
+    figure a { display: block; }
+    figure img, figure video { width: 100%; height: auto; display: block; border-radius: 8px; background: #fff; }
+    figure.framed img { border: 1px solid var(--border); }
+    @media (min-width: 1100px) {
+      figure.wide { width: 1000px; margin-left: calc(50% - 500px); }
+      figure.wide figcaption { max-width: 820px; margin-left: auto; margin-right: auto; }
+    }
+    figcaption { font-size: 0.95rem; color: var(--muted); margin-top: 0.7rem; line-height: 1.5; }
+    figcaption b { color: var(--text); }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (min-width: 1100px) { .grid3.wide { width: 1000px; margin-left: calc(50% - 500px); } }
+    .grid3 figure { margin: 0; }
+    .grid3 figcaption { text-align: left; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 800px) {
+      .grid3, .grid2 { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.9rem; }
+      body { font-size: 16px; }
+      h2.section-title { font-size: 1.6rem; }
+    }
+
+    /* ---------- contributions ---------- */
+    .contrib { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 1rem; }
+    .contrib div { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .contrib div b { display: block; margin-bottom: 4px; font-family: "Google Sans", "Noto Sans", sans-serif; }
+    .contrib div span { font-size: 0.98rem; color: #444; }
+    @media (max-width: 800px) { .contrib { grid-template-columns: 1fr; } }
+
+    /* ---------- stats ---------- */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 1.2rem 0 0.4rem; }
+    .stat { text-align: center; padding: 14px 8px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .stat .v { font-family: "Google Sans", "Noto Sans", sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .stat .l { font-size: 0.85rem; color: var(--muted); }
+    @media (max-width: 800px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ---------- video ---------- */
+    .video-wrap { max-width: 880px; margin: 0 auto; }
+    .video-wrap video { width: 100%; display: block; border-radius: 12px; background: #000; box-shadow: 0 8px 30px rgba(0,0,0,.12); }
+
+    /* ---------- code / bibtex ---------- */
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 18px; overflow-x: auto; font-size: 0.9rem; line-height: 1.5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+    pre code { background: none; padding: 0; }
+    .bib-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .copy { font-size: 0.85rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); background: #fff; cursor: pointer; color: var(--text); }
+    .copy:hover { background: var(--bg-alt); }
+
+    .repo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; margin: 0.8rem 0 1rem; font-size: 0.98rem; }
+    .repo div { padding: 6px 0; border-bottom: 1px dashed var(--border); }
+    .repo code { white-space: nowrap; }
+    @media (max-width: 800px) { .repo { grid-template-columns: 1fr; } }
+
+    .katex-display { margin: 0.8rem 0 1rem; overflow-x: auto; overflow-y: hidden; }
+    ul.plain { padding-left: 1.2rem; margin: 0 0 1rem; }
+    ul.plain li { margin-bottom: 0.35rem; }
+
+    footer { padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<!-- ===================================================== HERO -->
+<header class="hero">
+  <div class="container">
+    <h1>Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation</h1>
+
+    <p class="authors">
+      <span class="a">Guo Ning (Andrew) Sue<sup>*</sup>,</span>
+      <span class="a">Zheng Cao<sup>*</sup>,</span>
+      <span class="a">Junzhe Hu<sup>*</sup>,</span>
+      <span class="a">Xiangyun Bu,</span>
+      <span class="a">David Quinn,</span>
+      <span class="a">Tiancheng Wu,</span>
+      <span class="a">Zackory Erickson,</span>
+      <span class="a">Carmel Majidi</span>
+    </p>
+    <p class="affil">Carnegie Mellon University</p>
+    <p class="note"><sup>*</sup>Equal contribution</p>
+    <p class="venue">Accepted to <b>IROS 2026</b> &middot; IEEE/RSJ International Conference on Intelligent Robots and Systems</p>
+
+    <div class="links">
+      <a class="btn" href="https://arxiv.org/pdf/2609.16256" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5zM8 12h8v1.5H8V12zm0 3h8v1.5H8V15zm0 3h5v1.5H8V18z"/></svg>
+        Paper (arXiv)
+      </a>
+      <a class="btn" href="#video">
+        <svg viewBox="0 0 24 24"><path d="M4 5h11a2 2 0 0 1 2 2v2.5l4-2.5v10l-4-2.5V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+        Video
+      </a>
+      <a class="btn" href="https://github.com/ansue1234/ModTenV1" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.3 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>
+        Code
+      </a>
+      <a class="btn" href="https://tinyurl.com/ModTenV1" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5zm-8 8.5v6L12 22l8-5.5v-6l-8 4.5-8-4.5z"/></svg>
+        CAD
+      </a>
+    </div>
+
+    <div class="teaser">
+      <video autoplay muted loop playsinline poster="static/images/video_poster.jpg" aria-label="Teaser: the robot bending around an obstacle to press a switch, with the onboard pose estimate alongside">
+        <source src="static/videos/teaser.mp4" type="video/mp4">
+      </video>
+      <p class="caption">A 10-segment robot with three joint-stiffness sections bends around a rock pile to press a switch, while the onboard magnetic sensors estimate its pose (right) without any external tracking. Played at 2&times; speed.</p>
+    </div>
+  </div>
+</header>
+
+<!-- ===================================================== ABSTRACT -->
+<section id="abstract">
+  <div class="container narrow">
+    <h2 class="section-title">Abstract</h2>
+    <p>Continuum robots enable smooth shape morphing and safe interaction in confined environments. However, most existing systems are task-specific and depend on external sensing infrastructure, limiting their adaptability and real-world deployment. This paper presents a self-contained modular continuum robotic platform that combines mechanical reconfigurability with onboard pose estimation. The robot is constructed from interchangeable continuum joints with analytically precomputed stiffness, allowing rapid assembly and direct programming of the robot shape. Proprioceptive sensing is achieved using magnetic sensors and a modular learning-based framework, where a single model is trained per joint and reused across configurations. The system is experimentally validated in real world, demonstrating self-sensing capabilities and adaptation without external tracking.</p>
+
+    <div class="contrib">
+      <div><b>Modular, reconfigurable hardware</b><span>Rigid 3D-printed core segments with dovetail joints, interchangeable rings and accessories; assembled without tools, with as many segments as the tendons can drive.</span></div>
+      <div><b>Shape programming through joint stiffness</b><span>Hourglass TPU joints whose bending stiffness is set by the neck diameter and precomputed by FEA, so non-uniform curvature can be designed in.</span></div>
+      <div><b>In-situ magnetic self pose estimation</b><span>Each segment carries a coil and a magnetometer. One small MLP trained on a single joint is reused across every joint of the robot.</span></div>
+      <div><b>Real-world validation</b><span>Pose estimation under free, obstructed and hand-manipulated motion, plus obstacle traversal, sphere grasping and cloth grasping.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== VIDEO -->
+<section id="video" class="alt">
+  <div class="container">
+    <h2 class="section-title">Video</h2>
+    <div class="video-wrap">
+      <video controls preload="metadata" poster="static/images/video_poster.jpg">
+        <source src="static/videos/iros2026_video.mp4" type="video/mp4">
+        Your browser does not support the video tag. <a href="static/videos/iros2026_video.mp4">Download the video</a>.
+      </video>
+      <p class="caption">Experimental validation: obstacle traversal with variable-stiffness joints, grasping a soft sphere with compliant high-friction stoppers, and grasping a flexible sheet with alternative limb/ring attachments. Each clip shows the real experiment next to the onboard pose estimate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== PLATFORM -->
+<section id="platform">
+  <div class="container narrow">
+    <h2 class="section-title">A Plug-and-Play Continuum Robot</h2>
+    <p>The robot is a chain of identical rigid core segments, 3D printed in carbon-fiber-reinforced PET, connected by compliant 3D-printed TPU joints. Each core houses the sensing electronics and has dovetail features for the joint and outer slots for interchangeable PLA rings, whose size and geometry can be tailored to the task (for instance with high-friction studs for gripping). No threaded fasteners are needed: segments are assembled, swapped and taken apart by hand without tools. The study uses 8- and 10-segment robots driven by servo-actuated tendons.</p>
+
+    <figure class="framed wide">
+      <a href="static/images/fig2_components.jpg" target="_blank" rel="noopener" title="Open full size"><img src="static/images/fig2_components.jpg" alt="Component set of the modular continuum robot, exploded view of a module, and the custom sensing boards"></a>
+      <figcaption><b>Plug-and-play components.</b> (a) The full set: (1) sensing module, (2) sensor carrier, (3) cap, (4) stopper insert, (5) flexible joint, (6) limb modules in different sizes, (7) wiring harness. (b) Exploded view of one module and its place in a multi-segment assembly. (c) The custom per-segment board (IMU + magnetometer, linear regulator, MOSFET coil switch, microcontroller) and the custom logic-shifter board.</figcaption>
+    </figure>
+
+    <h3 class="sub">Programming shape through joint stiffness</h3>
+    <p>Every joint is a simple hourglass whose bending stiffness is governed mainly by its minimum neck diameter. Mixing joints of different necks along the body produces shapes with non-uniform curvature: in the teaser above, a "high", a "medium" and a "low" stiffness section let the robot reach around an obstacle and touch a switch. Stiffness was characterised with geometrically nonlinear finite-element studies in ANSYS (material data from uniaxial tension tests comparable to ASTM D412): a segment is bent to 30&deg; and the reaction moment \(M\) is fitted against bend angle \(\theta\) as</p>
+    $$ M = k\,\theta . $$
+    <p>Across neck diameters of 3 to 7&nbsp;mm the fitted stiffness rises from roughly 2 to 8&nbsp;N&middot;mm/deg, and a quadratic fit of that trend lets a designer pick the neck diameter that gives a required bending stiffness.</p>
+
+    <figure class="framed">
+      <a href="static/images/fig5_stiffness.png" target="_blank" rel="noopener" title="Open full size"><img src="static/images/fig5_stiffness.png" alt="FEA strain contour of a bent joint, and bending stiffness versus joint neck diameter with a quadratic fit"></a>
+      <figcaption><b>Joint bending stiffness.</b> (a) Equivalent elastic strain of a rotated joint segment from the finite-element study. (b) Bending stiffness of joints with 3 to 7&nbsp;mm minimum diameter, with a fitted quadratic curve.</figcaption>
+    </figure>
+
+    <h3 class="sub">Electronics</h3>
+    <p>Each segment carries a custom PCB with an ATtiny3224 microcontroller, an ICM-20948 9-DoF IMU (whose magnetometer is the sensing element), a TPS72118 low-dropout regulator, an SN74AXC4T774 level shifter for the IMU's 1.8&nbsp;V logic, and a diode plus N-channel MOSFET that switches the segment's coil (12&nbsp;mm tall, 19&nbsp;mm diameter, 27&nbsp;AWG). The microcontroller bridges SPI to the IMU and I&sup2;C to an Arduino MEGA; boards are daisy-chained with 5-pin JST XH connectors carrying power and the I&sup2;C bus, and a second custom BSS138 level-shifter board joins the 5&nbsp;V MEGA to the 3.3&nbsp;V chain. The MEGA streams readings to a Raspberry Pi, which runs the pose inference.</p>
+    <p>The magnetic pose-estimation method, its training pipeline and the experimental results are described in the <a href="https://arxiv.org/pdf/2609.16256" target="_blank" rel="noopener">paper</a>; the released code below implements them.</p>
+  </div>
+</section>
+
+<!-- ===================================================== CODE -->
+<section id="code" class="alt">
+  <div class="container narrow">
+    <h2 class="section-title">Code Release: ModTenV1</h2>
+    <p>Everything needed to build and run the sensing pipeline is released at <a href="https://github.com/ansue1234/ModTenV1" target="_blank" rel="noopener">github.com/ansue1234/ModTenV1</a> under the MIT license:</p>
+    <div class="repo">
+      <div><code>firmware/segment/</code> &mdash; ATtiny3224 firmware for every segment</div>
+      <div><code>firmware/base_controller/</code> &mdash; Arduino MEGA coil sequencer for deployment</div>
+      <div><code>firmware/data_collection_rig/</code> &mdash; two-segment training-rig sketch</div>
+      <div><code>data_collection/</code> &mdash; rig driver and dataset preparation</div>
+      <div><code>training/</code> &mdash; train, evaluate, ONNX export, convention check, paper hyper-parameters</div>
+      <div><code>ros_ws/</code> &mdash; ROS&nbsp;2 Humble <code>pose_estimator</code> package, Docker setup and the <b>pretrained model</b></div>
+    </div>
+    <p>The mechanical design files (CAD for the segments, joints, rings and stoppers) are available at <a href="https://tinyurl.com/ModTenV1" target="_blank" rel="noopener">tinyurl.com/ModTenV1</a>.</p>
+  </div>
+</section>
+
+<!-- ===================================================== BIBTEX -->
+<section id="bibtex">
+  <div class="container narrow">
+    <h2 class="section-title">BibTeX</h2>
+    <div class="bib-head">
+      <span class="caption" style="margin:0;text-align:left">If you use the platform, the model or the code, please cite:</span>
+      <button class="copy" id="copybib" type="button">Copy</button>
+    </div>
+<pre id="bib"><code>@inproceedings{sue2026tendon,
+  title     = {Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation},
+  author    = {Sue, Guo Ning and Cao, Zheng and Hu, Junzhe and Bu, Xiangyun and Quinn, David and
+               Wu, Tiancheng and Erickson, Zackory and Majidi, Carmel},
+  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year      = {2026},
+  note      = {arXiv:2609.16256}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Carnegie Mellon University &middot; IROS 2026 &middot; <a href="https://arxiv.org/abs/2609.16256" target="_blank" rel="noopener">arXiv:2609.16256</a> &middot; <a href="https://github.com/ansue1234/ModTenV1" target="_blank" rel="noopener">Code</a>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var b = document.getElementById('copybib');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var t = document.getElementById('bib').innerText;
+      function done() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done, done);
+      } else {
+        var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+        ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done();
+      }
+    });
+  })();
+</script>
+</body>
+</html>
