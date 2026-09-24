@@ -1,0 +1,16 @@
+{
+  "n_layers": 4,
+  "width_0": 1078,
+  "width_1": 222,
+  "width_2": 212,
+  "width_3": 346,
+  "activation": "gelu",
+  "leaky_slope": 0.0016548438828812256,
+  "dropout": 0.0003893149508797399,
+  "use_batchnorm": false,
+  "lr": 0.0005625937720177696,
+  "weight_decay": 0.002311277086166279,
+  "batch_size": 256,
+  "use_weight_2d": false,
+  "loss_type": "cosine"
+}

@@ -1,0 +1,12 @@
+# Training / evaluation / export.  Install PyTorch for your platform first if you want CUDA
+# (https://pytorch.org/get-started/locally/); the CPU wheel from PyPI works too.
+torch>=2.1
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+tqdm>=4.65
+onnx>=1.15
+onnxruntime>=1.16
+# optional logging
+tensorboard>=2.14
+wandb>=0.16

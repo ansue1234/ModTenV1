@@ -1,0 +1,37 @@
+# ROS 2 Humble container for the Raspberry Pi 5 (or any Linux host).
+#
+#   docker compose build
+#   docker compose run --rm ros            # interactive shell in /ws (this folder)
+#   colcon build --packages-select pose_estimator && source install/setup.bash
+#
+# The two serial devices below are the Arduino MEGA (segment chain) and the
+# U2D2 (tendon servos).  Replace them with your own /dev/serial/by-id/... paths
+# (`ls -l /dev/serial/by-id/`), or use the plain /dev/ttyACM0 / /dev/ttyUSB0.
+services:
+  ros:
+    build:
+      context: .
+      args:
+        UID: 1000
+        GID: 1000
+        USERNAME: ros
+    image: modtenv1-ros-humble
+    container_name: modtenv1-ros
+    network_mode: host
+    tty: true
+    stdin_open: true
+
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"     # Arduino MEGA running MultiBridgeCollectionFast.ino
+      - "/dev/ttyUSB0:/dev/ttyUSB0"     # U2D2 (only needed for tendon_system.launch.py)
+    # Stable alternative (recommended once you know the ids):
+    # devices:
+    #   - "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_XXXX-if00:/dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_XXXX-if00"
+    #   - "/dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_XXXX-if00-port0:/dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_XXXX-if00-port0"
+
+    volumes:
+      - .:/ws
+    working_dir: /ws
+
+    environment:
+      - ROS_DOMAIN_ID=0

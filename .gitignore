@@ -1,0 +1,29 @@
+# data, checkpoints and logs are never committed
+data/
+**/data/
+*.csv
+*.bag
+*rosbag*
+*.db3
+*.mcap
+*.pt
+runs/
+tb_logs/
+wandb/
+optuna_runs/*.db
+
+# ROS 2 build products
+ros_ws/build/
+ros_ws/install/
+ros_ws/log/
+
+# python / editors
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*~
+
+# scratch folder used during packaging
+_to_delete/

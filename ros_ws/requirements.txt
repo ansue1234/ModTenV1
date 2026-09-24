@@ -1,0 +1,7 @@
+# Python packages used by the pose_estimator nodes (installed into the Docker image;
+# on a bare ROS 2 Humble install run `pip3 install -r requirements.txt`)
+numpy>=1.24
+scipy>=1.10
+pyserial>=3.5
+onnxruntime>=1.16
+dynamixel-sdk>=3.7

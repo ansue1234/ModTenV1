@@ -1,0 +1,9 @@
+# Configuration for Pose Estimator Node
+
+pose_estimator_node:
+  ros__parameters:
+    # pretrained model installed by `colcon build` (path inside the Docker container; adjust outside Docker)
+    model_path: "/ws/install/pose_estimator/share/pose_estimator/model/final_model.onnx"
+    coil_radius: 0.012          # Radial distance from previous platform to this coil, metres
+    publish_rate: 10.0        # TF re-broadcast rate, Hz
+    platform_z_offset: 0.047  # Z offset from coil frame to platform frame, metres (47 mm)

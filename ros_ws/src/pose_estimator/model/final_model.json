@@ -1,0 +1,57 @@
+{
+  "source_checkpoint": "paper model: train.py with configs/mlp_dir_optuna_best_params.json, 600 epochs, seed 42",
+  "input": "input: float32 (N,3) de-biased magnetometer vector (mx,my,mz) -- any scale, normalised inside the graph",
+  "output": "output: float32 (N,3) direction vector d=(dx,dy,dz) -- unit length",
+  "angle_convention": "colatitude",
+  "theta_deg": "degrees(arctan2(dy, dx))   azimuth about +Z",
+  "lambda_deg": "degrees(arccos(dz))       colatitude, 0 = straight",
+  "x_cols": [
+    "mx_uT_debias",
+    "my_uT_debias",
+    "mz_uT_debias"
+  ],
+  "y_cols_angles": [
+    "Theta_deg",
+    "lambda_deg"
+  ],
+  "hidden_dims": [
+    1078,
+    222,
+    212,
+    346
+  ],
+  "activation": "gelu",
+  "dropout": 0.0003893149508797399,
+  "use_batchnorm": false,
+  "loss_type": "cosine",
+  "holdout_metrics": {
+    "dir_mae_deg": 3.29790624111429,
+    "dir_rmse_deg": 3.850265384373564,
+    "dir_p95_deg": 6.8551165110104515,
+    "rmse_theta": 28.260074014205827,
+    "rmse_phi": 2.8088141388292085,
+    "mae_theta": 13.55209842851335,
+    "mae_phi": 2.1386617549549607,
+    "rmse_mean": 15.534444076517518,
+    "mae_mean": 7.845380091734155,
+    "r2_dx": 0.9832990445695069,
+    "r2_dy": 0.9722500277735816,
+    "r2_dz": 0.9470834437271649,
+    "r2_dir_mean": 0.9675441720234178,
+    "r2_phi": 0.957507777242093
+  },
+  "opset": 17,
+  "normalisation_baked": true,
+  "verification": {
+    "n_inputs": 512,
+    "max_angle_diff_deg": 1.998632615141105e-05,
+    "max_abs_diff": 3.129243850708008e-07
+  },
+  "held_out_session_metrics": {
+    "session": "held-out session (5154 rows, segment pair not used in training)",
+    "dir_rmse_deg": 5.88,
+    "rmse_lambda_deg": 4.33,
+    "rmse_theta_deg_lambda_ge_10": 10.75,
+    "rmse_theta_deg_all": 15.57
+  }
+}

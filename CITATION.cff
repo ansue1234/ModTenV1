@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: "If you use this code or the pretrained model, please cite the paper below."
+title: "ModTenV1: code for 'Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation'"
+type: software
+license: MIT
+repository-code: "https://github.com/ansue1234/ModTenV1"
+url: "https://ansue1234.github.io/ModTenV1/"
+authors:
+  - family-names: Sue
+    given-names: Guo Ning
+  - family-names: Cao
+    given-names: Zheng
+  - family-names: Hu
+    given-names: Junzhe
+  - family-names: Bu
+    given-names: Xiangyun
+  - family-names: Quinn
+    given-names: David
+  - family-names: Wu
+    given-names: Tiancheng
+  - family-names: Erickson
+    given-names: Zackory
+  - family-names: Majidi
+    given-names: Carmel
+preferred-citation:
+  type: conference-paper
+  title: "Tendon-Driven Continuum Robot with Modular Stiffness and In-Situ Self Pose Estimation"
+  authors:
+    - family-names: Sue
+      given-names: Guo Ning
+    - family-names: Cao
+      given-names: Zheng
+    - family-names: Hu
+      given-names: Junzhe
+    - family-names: Bu
+      given-names: Xiangyun
+    - family-names: Quinn
+      given-names: David
+    - family-names: Wu
+      given-names: Tiancheng
+    - family-names: Erickson
+      given-names: Zackory
+    - family-names: Majidi
+      given-names: Carmel
+  collection-title: "IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)"
+  year: 2026
+  identifiers:
+    - type: other
+      value: "arXiv:2609.16256"
+  url: "https://arxiv.org/abs/2609.16256"
